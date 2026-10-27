@@ -31,6 +31,21 @@
         defaultText = lib.literalExpression "pkgs.stdenv";
       };
 
+      overlays = lib.mkOption {
+        type = types.listOf (types.functionTo (types.functionTo types.attrs));
+        description = "List of overlays to apply to pkgs. Each overlay is a function that takes two arguments: final and prev. Supported by devenv 1.4.2 or newer.";
+        default = [ ];
+        example = lib.literalExpression ''
+          [
+            (final: prev: {
+              hello = prev.hello.overrideAttrs (oldAttrs: {
+                patches = (oldAttrs.patches or []) ++ [ ./hello-fix.patch ];
+              });
+            })
+          ]
+        '';
+      };
+
       enterShell = lib.mkOption {
         type = types.lines;
         description = "Bash code to execute when entering the shell.";
@@ -72,7 +87,7 @@
     let
       listEntries = path: map (name: path + "/${name}") (builtins.attrNames (builtins.readDir path));
     in
-    [ ] ++ (listEntries ./languages) ++ (listEntries ./integrations);
+    [ ./lib.nix ] ++ (listEntries ./languages) ++ (listEntries ./integrations);
 
   config = {
     enterShell = lib.mkBefore ''

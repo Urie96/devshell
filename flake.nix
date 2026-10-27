@@ -62,23 +62,28 @@
         mkEval =
           args@{
             pkgs,
-            inputs ? [ ],
+            inputs ? { },
+            # Fallback for inputs the flake does not declare, see
+            # `config.lib.getInput`. Evaluated lazily, so the file is only read
+            # when an input is actually resolved through niv.
+            niv ? (import ./nix/sources.nix) { inherit pkgs; },
             modules,
             lib ? pkgs.lib,
           }:
           let
             modules = [
               (./modules/top-level.nix)
-              {
+              ({ config, ... }: {
                 _module.args =
                   let
                     system = pkgs.stdenv.hostPlatform.system;
                   in
                   {
-                    inherit pkgs inputs system;
+                    inherit inputs niv system;
                     multiverse = multiverse.multiverse.${system};
+                    pkgs = pkgs.appendOverlays (config.overlays or [ ]);
                   };
-              }
+              })
             ]
             ++ args.modules;
 

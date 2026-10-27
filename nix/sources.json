@@ -1,0 +1,38 @@
+{
+    "arduino-index": {
+        "branch": "main",
+        "description": "Git-tracked history of Arduino package and library indexes",
+        "homepage": null,
+        "owner": "bouk",
+        "repo": "arduino-indexes",
+        "rev": "2ec5ffc34311c12511a8e1dfec5d80181a2fc3f7",
+        "sha256": "0k6k792c80vl00zi95q0kczw980gbk3abd2kzqyrv7dwqa8hpgqk",
+        "type": "tarball",
+        "url": "https://github.com/bouk/arduino-indexes/archive/2ec5ffc34311c12511a8e1dfec5d80181a2fc3f7.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "arduino-nix": {
+        "branch": "main",
+        "description": "Manage your arduino-cli with Nix",
+        "homepage": "",
+        "owner": "bouk",
+        "repo": "arduino-nix",
+        "rev": "cfa82ced5b5d9436edec9238cf493f6b2c643869",
+        "sha256": "07bn4fnr08km5i1kiymg1ahz1qrf6ck89mzq4gx8kn1xxrar2p5s",
+        "type": "tarball",
+        "url": "https://github.com/bouk/arduino-nix/archive/cfa82ced5b5d9436edec9238cf493f6b2c643869.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "flake-utils": {
+        "branch": "main",
+        "description": "Pure Nix flake utility functions [maintainer=@zimbatm]",
+        "homepage": "",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "b7a79d3fea1e214f6d668d521cecec0c01e26544",
+        "sha256": "0c26359bj49yhkv2kqrqzc9w6672pyjiw7v1kvqcjsh005yz3zv5",
+        "type": "tarball",
+        "url": "https://github.com/numtide/flake-utils/archive/b7a79d3fea1e214f6d668d521cecec0c01e26544.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    }
+}
