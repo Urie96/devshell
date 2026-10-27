@@ -34,5 +34,29 @@
         "type": "tarball",
         "url": "https://github.com/numtide/flake-utils/archive/b7a79d3fea1e214f6d668d521cecec0c01e26544.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs-esp-dev": {
+        "branch": "master",
+        "description": "Nix flake and overlay for ESP8266 and ESP32 development.",
+        "homepage": "",
+        "owner": "mirrexagon",
+        "repo": "nixpkgs-esp-dev",
+        "rev": "5287d6e1ca9e15ebd5113c41b9590c468e1e001b",
+        "sha256": "12mhbc5r5k5ng2361184blfgn58hiqpla7mjrk6ppy0xjsnpaqa1",
+        "type": "tarball",
+        "url": "https://github.com/mirrexagon/nixpkgs-esp-dev/archive/5287d6e1ca9e15ebd5113c41b9590c468e1e001b.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "systems": {
+        "branch": "main",
+        "description": "[ \"aarch64-darwin\" \"aarch64-linux\" \"x86_64-darwin\" \"x86_64-linux\" ]",
+        "homepage": "github:nix-systems/default",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "d36eeed142f88b5a636f2e3856a53c61654cf29b",
+        "sha256": "1px59x3bzz6m4v5dki2s1g4kyjzi6gbwbswpvpssvwb485pagrms",
+        "type": "tarball",
+        "url": "https://github.com/nix-systems/default/archive/d36eeed142f88b5a636f2e3856a53c61654cf29b.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }
