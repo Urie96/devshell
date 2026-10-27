@@ -47,6 +47,7 @@
                 languages.go.enable = true;
                 languages.go.version = "1.24.6";
                 android.enable = true;
+                arduino.enable = true;
               }
             ];
           };

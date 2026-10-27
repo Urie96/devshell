@@ -139,20 +139,12 @@ let
   #      flake.nix, unless the caller passes `flake = false`.
   #
   # `flake` and `stack` are internal, see `mkFlake`.
-  getInput =
-    arg:
-    let
-      name =
-        if isString arg then
-          arg
-        else if arg ? name then
-          arg.name
-        else
-          throw "devshell: getInput expects a name or { name = \"...\"; }";
-
-      flake = if isString arg then true else arg.flake or true;
-      stack = if isString arg then [ ] else arg.stack or [ ];
-    in
+  resolve =
+    {
+      name,
+      flake ? true,
+      stack ? [ ],
+    }:
     if inputs ? ${name} then
       # `inputs.${name}` is either an evaluated flake or a source tree; Nix
       # already honoured the declaration in this flake.nix. Only downgrade on
@@ -177,6 +169,56 @@ let
         Not a niv source:          ${describe (attrNames niv)}
 
         Declare it in the flake's `inputs`, or add it with `niv add`.'';
+
+  # Nix memoises thunks, not function calls: without this table every
+  # `getInput "foo"` would run `mkFlake` again, i.e. re-run the nested flake's
+  # `outputs` function (the flake.nix itself is parsed and fetched once, since
+  # Nix caches imports by path and fetches by store path). `inputs` needs no
+  # table: those values are already shared thunks owned by the flake.
+  #
+  # Only top-level niv resolutions are cached: while resolving the inputs of a
+  # nested flake the `stack` is non-empty and `resolve` is used directly, so a
+  # cycle still turns into a readable error instead of Nix's "infinite
+  # recursion encountered".
+  memo = lib.genAttrs (attrNames niv) (name: {
+    flake = resolve {
+      inherit name;
+      flake = true;
+    };
+    source = resolve {
+      inherit name;
+      flake = false;
+    };
+  });
+
+  # Resolve an input by name, see `resolve` for the lookup order. The public
+  # entry point: no `stack`, and results are shared between calls.
+  getInput =
+    arg:
+    let
+      name =
+        if isString arg then
+          arg
+        else if arg ? name then
+          arg.name
+        else
+          throw "devshell: getInput expects a name or { name = \"...\"; }";
+
+      flake = if isString arg then true else arg.flake or true;
+      stack = if isString arg then [ ] else arg.stack or [ ];
+    in
+    if stack != [ ] || inputs ? ${name} then
+      # `inputs` is consulted first and never forced through niv, so a broken
+      # or missing niv setup does not affect inputs that are declared anyway.
+      resolve {
+        inherit name flake stack;
+      }
+    else if niv ? ${name} then
+      memo.${name}.${if flake then "flake" else "source"}
+    else
+      resolve {
+        inherit name flake stack;
+      };
 
 in
 {
