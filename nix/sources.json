@@ -23,6 +23,18 @@
         "url": "https://github.com/bouk/arduino-nix/archive/cfa82ced5b5d9436edec9238cf493f6b2c643869.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "flake-compat": {
+        "branch": "master",
+        "description": "Use flakes from non-flake Nix: read flake.nix + flake.lock and fetch the locked inputs",
+        "homepage": "https://github.com/NixOS/flake-compat",
+        "owner": "NixOS",
+        "repo": "flake-compat",
+        "rev": "5edf11c44bc78a0d334f6334cdaf7d60d732daab",
+        "sha256": "0yqfa6rx8md81bcn4szfp0hjq2f3h9i8zjzhqqyfqdkrj5559nmw",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/flake-compat/archive/5edf11c44bc78a0d334f6334cdaf7d60d732daab.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "flake-utils": {
         "branch": "main",
         "description": "Pure Nix flake utility functions [maintainer=@zimbatm]",

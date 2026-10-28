@@ -27,23 +27,29 @@
         "aarch64-darwin"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
+
+      # The pkgs every consumer gets unless it passes its own, so that
+      # `mkEval { system = ...; }` behaves exactly like `mkEval { pkgs = ...; }`
+      # with the pkgs from `devShells`.
+      mkPkgs =
+        system:
+        import nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+            android_sdk.accept_license = true;
+          };
+        };
     in
     {
       devShells = forAllSystems (
         system:
         let
-          pkgs = import nixpkgs {
-            inherit system;
-            config = {
-              allowUnfree = true;
-              android_sdk.accept_license = true;
-            };
-          };
-
           base = self.lib.mkShell {
-            inherit inputs pkgs;
+            inherit inputs system;
             modules = [
               {
+                espidf.enable = true;
               }
             ];
           };
@@ -57,17 +63,28 @@
         mkConfig = args: (self.lib.mkEval args).config;
 
         mkEval =
-          args@{
-            pkgs,
-            inputs ? { },
+          args:
+          let
+            # `pkgs` and `system` are interchangeable, exactly one of them has
+            # to be passed (`pkgs` wins if both are given and agree).
+            pkgs =
+              if args ? pkgs && args.pkgs != null then
+                if args ? system && args.system != null && args.system != args.pkgs.stdenv.hostPlatform.system then
+                  throw "mkEval: `system` is `${args.system}` but `pkgs` is for `${args.pkgs.stdenv.hostPlatform.system}`"
+                else
+                  args.pkgs
+              else if args ? system && args.system != null then
+                mkPkgs args.system
+              else
+                throw "mkEval: pass either `pkgs` or `system`";
+
+            lib = args.lib or pkgs.lib;
+            inputs = args.inputs or { };
             # Fallback for inputs the flake does not declare, see
             # `config.lib.getInput`. Evaluated lazily, so the file is only read
             # when an input is actually resolved through niv.
-            niv ? (import ./nix/sources.nix) { inherit pkgs; },
-            modules,
-            lib ? pkgs.lib,
-          }:
-          let
+            niv = args.niv or (import ./nix/sources.nix { inherit pkgs; });
+
             modules = [
               (./modules/top-level.nix)
               ({ config, ... }: {
@@ -83,13 +100,11 @@
               })
             ]
             ++ args.modules;
-
-            project = lib.evalModules {
-              class = "devshell";
-              inherit modules;
-            };
           in
-          project;
+          lib.evalModules {
+            class = "devshell";
+            inherit modules;
+          };
 
         mkShell =
           args:
