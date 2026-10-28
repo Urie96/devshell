@@ -36,7 +36,7 @@ in
       };
       package = lib.mkOption {
         type = lib.types.package;
-        default = pinnedPkgs.delve;
+        default = pkgs.delve;
         defaultText = lib.literalExpression "pkgs.delve";
         description = "The Delve package to use. Override this to customize the build, e.g. to disable tests.";
       };
@@ -48,7 +48,7 @@ in
       };
       package = lib.mkOption {
         type = lib.types.package;
-        default = pinnedPkgs.gopls;
+        default = pkgs.gopls;
         defaultText = lib.literalExpression "pkgs.gopls";
         description = "The Go language server package to use.";
       };
@@ -67,7 +67,6 @@ in
       impl
       go-tools
       gotests
-      protoc-gen-go
     ])
     ++ lib.optional cfg.lsp.enable cfg.lsp.package;
 
