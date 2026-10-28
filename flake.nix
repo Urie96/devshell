@@ -10,15 +10,12 @@
 
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.zst";
-
-    multiverse.url = "github:fzakaria/nixpkgs-multiverse";
   };
 
   outputs =
     {
       self,
       nixpkgs,
-      multiverse,
       ...
     }@inputs:
     let
@@ -42,22 +39,20 @@
         };
     in
     {
-      devShells = forAllSystems (
-        system:
-        let
-          base = self.lib.mkShell {
-            inherit inputs system;
-            modules = [
-              {
-                espidf.enable = true;
-              }
-            ];
-          };
-        in
-        {
-          default = base;
-        }
-      );
+      devShells = forAllSystems (system: {
+        default = self.lib.mkShell {
+          inherit inputs system;
+          modules = [
+            {
+              languages.go = {
+                version = "1.24.6";
+                enable = true;
+              };
+              # espidf.enable = true;
+            }
+          ];
+        };
+      });
 
       lib = {
         mkConfig = args: (self.lib.mkEval args).config;
@@ -94,7 +89,6 @@
                   in
                   {
                     inherit inputs niv system;
-                    multiverse = multiverse.multiverse.${system};
                     pkgs = pkgs.appendOverlays (config.overlays or [ ]);
                   };
               })

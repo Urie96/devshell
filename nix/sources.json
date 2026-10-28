@@ -47,6 +47,18 @@
         "url": "https://github.com/numtide/flake-utils/archive/b7a79d3fea1e214f6d668d521cecec0c01e26544.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "multiverse": {
+        "branch": "main",
+        "description": "Any version of any nixpkgs package, from one flake input",
+        "homepage": "https://nixmultiverse.com/",
+        "owner": "fzakaria",
+        "repo": "nixpkgs-multiverse",
+        "rev": "5f6ab42a3824515c3e08a2bfd5577e3ea2951c7a",
+        "sha256": "0yjrjg0yxzykmf5q2wr7zvfzrhw7jxxm6nifki166rnd9859xnjb",
+        "type": "tarball",
+        "url": "https://github.com/fzakaria/nixpkgs-multiverse/archive/5f6ab42a3824515c3e08a2bfd5577e3ea2951c7a.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "nixpkgs-esp-dev": {
         "branch": "master",
         "description": "Nix flake and overlay for ESP8266 and ESP32 development.",

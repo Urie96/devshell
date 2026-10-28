@@ -1,12 +1,13 @@
 {
   pkgs,
   config,
-  multiverse,
   lib,
   ...
 }:
 let
   cfg = config.languages.go;
+
+  multiverse = (config.lib.getInput "multiverse").multiverse.${pkgs.stdenv.hostPlatform.system};
 
   pinnedPkgs =
     if cfg.version != null then (multiverse.at (multiverse.revOf "go" cfg.version)) else pkgs;
