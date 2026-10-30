@@ -329,6 +329,14 @@ in
     # `wrapArduinoCLI` is used, which is why this is not just `packages`.
     overlays = [
       arduino-nix.overlay
+      # `packages.nix` in the pinned `arduino-nix` still reads
+      # `pkgsBuildHost.xorg.lndir`. In current nixpkgs `xorg` is only a set of
+      # deprecated aliases whose values warn on instantiation ("The xorg
+      # package set has been deprecated, 'xorg.lndir' has been renamed to
+      # 'lndir'"), which makes `nix flake check` noisy. Re-expose the real
+      # package under that name; drop this once the pin contains the upstream
+      # fix (`inherit (pkgsBuildHost) lndir;`).
+      (final: prev: { xorg = prev.xorg // { lndir = prev.lndir; }; })
     ]
     ++ map (name: arduino-nix.mkArduinoPackageOverlay (indexFile name)) cfg.packageIndexes
     ++ map (name: arduino-nix.mkArduinoLibraryOverlay (indexFile name)) cfg.libraryIndexes;

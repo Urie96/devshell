@@ -102,7 +102,13 @@
       // config.env
     );
 
-    ci = [ config.shell ];
+    # Everything CI has to build for this shell: the shell itself and the
+    # activation script (which renders the environment, so a broken
+    # `get-env.sh`/`devshell-bash.py` is caught too).
+    ci = [
+      config.shell
+      config.activation
+    ];
     ciDerivation = pkgs.runCommand "ci" { } "echo ${toString config.ci} > $out";
 
     activation =

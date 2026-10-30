@@ -19,11 +19,12 @@
       ...
     }@inputs:
     let
+      lib = nixpkgs.lib;
       systems = [
         "x86_64-linux"
         "aarch64-darwin"
       ];
-      forAllSystems = nixpkgs.lib.genAttrs systems;
+      forAllSystems = lib.genAttrs systems;
 
       # The pkgs every consumer gets unless it passes its own, so that
       # `mkEval { system = ...; }` behaves exactly like `mkEval { pkgs = ...; }`
@@ -37,22 +38,87 @@
             android_sdk.accept_license = true;
           };
         };
+
+      # One module list per devShell: `nix develop .#go`, `nix develop .#javascript`,
+      # … Every `enable` switch of the area is turned on, so each of these also
+      # proves the module builds at all (see `checks`). `delve`, `lsp`, `nodejs`
+      # and the language-server switches already default to true and are
+      # deliberately not repeated here.
+      featureModules = {
+        go = [ { languages.go.enable = true; } ];
+        javascript = [
+          {
+            languages.javascript = {
+              enable = true;
+              corepack.enable = true;
+              npm.enable = true;
+              pnpm.enable = true;
+              yarn.enable = true;
+              bun.enable = true;
+            };
+          }
+        ];
+        python = [
+          {
+            languages.python = {
+              enable = true;
+              uv.enable = true;
+            };
+          }
+        ];
+        java = [
+          {
+            languages.java = {
+              enable = true;
+              maven.enable = true;
+              gradle.enable = true;
+            };
+          }
+        ];
+        dart = [ { languages.dart.enable = true; } ];
+        android = [ { android.enable = true; } ];
+        arduino = [ { arduino.enable = true; } ];
+        espidf = [ { espidf.enable = true; } ];
+      };
+
+      shellNames = builtins.attrNames featureModules;
+
+      # Printed by `nix develop` without an attribute; derived from
+      # `featureModules`, so it cannot go stale.
+      helpText = lib.concatMapStringsSep "\n" (name: "  nix develop .#${name}") shellNames;
     in
     {
-      devShells = forAllSystems (system: {
-        default = self.lib.mkShell {
-          inherit inputs system;
-          modules = [
+      devShells = forAllSystems (
+        system:
+        let
+          shellFor =
+            modules:
+            self.lib.mkShell {
+              inherit inputs system;
+              modules = modules;
+            };
+        in
+        lib.mapAttrs (_: shellFor) featureModules
+        // {
+          # `nix develop` on its own builds a shell that only says what to pick.
+          default = shellFor [
             {
-              languages.go = {
-                version = "1.24.6";
-                enable = true;
-              };
-              # espidf.enable = true;
+              name = "aurora-devshell-help";
+              enterShell = ''
+                echo "Aurora development shells:"
+                echo
+                echo ${lib.escapeShellArg helpText}
+                echo
+                echo "Enter one with: nix develop .#<name>"
+              '';
             }
           ];
-        };
-      });
+        }
+      );
+
+      # `checks` is one `ciDerivation` per devShell: `nix flake check` (and CI)
+      # builds the shell's closure and its activation script.
+      checks = forAllSystems (system: lib.mapAttrs (_: shell: shell.ci) self.devShells.${system});
 
       lib = {
         mkConfig = args: (self.lib.mkEval args).config;
